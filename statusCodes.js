@@ -4,6 +4,8 @@ export function getStatusMessage(statusCode) {
       return 'OK';
     case 400:
       return 'Bad Request';
+    case 404:
+      return 'Not Found';
     case 401:
       return 'Unauthorized';
     case 405:
