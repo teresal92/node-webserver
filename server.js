@@ -46,6 +46,8 @@ const server = net.createServer((c) => {
       return;
     }
 
+    const response = generateResponse(httpVersion, 405, path);
+    c.write(response);
     c.end();
   });
 

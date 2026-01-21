@@ -6,6 +6,8 @@ export function getStatusMessage(statusCode) {
       return 'Bad Request';
     case 401:
       return 'Unauthorized';
+    case 405:
+      return 'Method Not Allowed';
     case 500:
       return 'Internal Server Error';
   }
