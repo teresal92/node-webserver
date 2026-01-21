@@ -1,5 +1,6 @@
 import net from 'node:net';
-import { getStatusMessage } from './statusCodes';
+import fs from 'fs/promises';
+import { getStatusMessage } from './statusCodes.js';
 
 const IP = '127.0.0.1';
 const PORT = 80;
@@ -19,16 +20,18 @@ function parseRequest(data) {
   }
 };
 
-function generateResponse(httpVersion = DEFAULT_HTTP_VERSION, statusCode = 500, path = null) {
+function generateResponse(httpVersion = DEFAULT_HTTP_VERSION, statusCode = 500, body = null) {
   const statusMessage = getStatusMessage(statusCode);
-  const pathInfo = path ? `\r\nRequested path: ${path}` : '';
-  return `${httpVersion} ${statusCode} ${statusMessage}\r\n${pathInfo}\r\n`;
-}
+  const bodyContent = body || '';
+
+  return `${httpVersion} ${statusCode}\r\n\r\n${statusMessage}\r\n${bodyContent}\r\n`;
+};
+
 
 const server = net.createServer((c) => {
   console.log('SERVER CONNECTED');
 
-  c.on('data', (data) => {
+  c.on('data', async (data) => {
     const req = parseRequest(data);
     if (!req) {
       const response = generateResponse(DEFAULT_HTTP_VERSION, 400);
@@ -40,7 +43,23 @@ const server = net.createServer((c) => {
     const { method, path, httpVersion } = req;
 
     if (method === "GET") {
-      const response = generateResponse(httpVersion, 200, path);
+      if (path === "/" || path === "/index.html") {
+        try {
+          const fileData = await fs.readFile('index.html', 'utf8');
+          const response = generateResponse(httpVersion, 200, fileData);
+          c.write(response);
+          c.end();
+          return;
+        } catch (err) {
+          console.error(err);
+          const response = generateResponse(httpVersion, 404, 'Error fetching resource');
+          c.write(response);
+          c.end();
+          return;
+        }
+      }
+
+      const response = generateResponse(httpVersion, 200, `Requested path: ${path}`);
       c.write(response);
       c.end();
       return;
