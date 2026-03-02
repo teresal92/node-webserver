@@ -1,0 +1,8 @@
+{
+  "compilerOptions": {
+    "outDir": "./build", // location to emit all output files
+    "allowJs": true, // accept JS files as inputs
+    "target": "es5" // translate newer JS constructs to es5
+  },
+  "include": ["./src/**/*"] // what files to include
+}

@@ -1,9 +1,9 @@
-import net from 'node:net';
-import { getStatusMessage } from './statusCodes';
+import * as net from "node:net";
+import { getStatusMessage } from "./statusCodes";
 
-const IP = '127.0.0.1';
+const IP = "127.0.0.1";
 const PORT = 80;
-const DEFAULT_HTTP_VERSION = 'HTTP/1.1';
+const DEFAULT_HTTP_VERSION = "HTTP/1.1";
 
 function parseRequest(data) {
   const lines = data.toString().split("\r\n");
@@ -11,24 +11,28 @@ function parseRequest(data) {
 
   if (!requestLine) return null;
 
-  const [method, path, httpVersion] = requestLine.split(' ');
+  const [method, path, httpVersion] = requestLine.split(" ");
   return {
     method,
     path,
-    httpVersion
-  }
-};
+    httpVersion,
+  };
+}
 
-function generateResponse(httpVersion = DEFAULT_HTTP_VERSION, statusCode = 500, path = null) {
+function generateResponse(
+  httpVersion = DEFAULT_HTTP_VERSION,
+  statusCode = 500,
+  path = null,
+) {
   const statusMessage = getStatusMessage(statusCode);
-  const pathInfo = path ? `\r\nRequested path: ${path}` : '';
+  const pathInfo = path ? `\r\nRequested path: ${path}` : "";
   return `${httpVersion} ${statusCode} ${statusMessage}\r\n${pathInfo}\r\n`;
 }
 
 const server = net.createServer((c) => {
-  console.log('SERVER CONNECTED');
+  console.log("SERVER CONNECTED");
 
-  c.on('data', (data) => {
+  c.on("data", (data) => {
     const req = parseRequest(data);
     if (!req) {
       const response = generateResponse(DEFAULT_HTTP_VERSION, 400);
@@ -51,20 +55,19 @@ const server = net.createServer((c) => {
     c.end();
   });
 
-
-  c.on('end', () => {
-    console.log('SERVER DISCONNECTED');
+  c.on("end", () => {
+    console.log("SERVER DISCONNECTED");
   });
 
-  c.on('error', (err) => {
-    console.error('Socket error: ', err);
+  c.on("error", (err) => {
+    console.error("Socket error: ", err);
   });
 });
 
-server.on('error', (err) => {
+server.on("error", (err) => {
   console.error(err);
   throw err;
-})
+});
 
 server.listen(PORT, () => {
   console.log(`Server listening on port: ${PORT}`);
