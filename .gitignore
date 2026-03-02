@@ -1,0 +1,17 @@
+# build artifacts
+build/
+dist/
+*.log
+
+# ignore dependency directories
+node_modules/
+
+# system-specific files
+.DS_Store
+
+# IDE config files
+.vscode/
+
+# env files
+.env
+config.json
